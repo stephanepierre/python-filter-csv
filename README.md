@@ -1,7 +1,9 @@
-# Script créé par PS-WEB PIERRE Stéphane
+> Script créé par PS-WEB PIERRE Stéphane
 
 Ce script est créé pour que depuis un fichier CSV importé de l'appli CROO, on trie en 3 fichiers.
 On enlève les noms des extensions que l'on ne veut pas voir apparaitre dans les différents fichiers.
+
+# Les différents fichiers
 
 ## 1er fichier
 
