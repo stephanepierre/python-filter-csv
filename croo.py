@@ -34,9 +34,18 @@ df_filtre = df[(df["action"].isin(["missed", "voicemail"])) &
                (df["direction"] != "internal") &
                (~df["extension_name"].isin(noms_exclus))]
 
-# Séparation des données VENTE et SAV
-df_vente = df_filtre[df_filtre["extension_name"].str.contains("Sales", case=False, na=False)]
-df_sav = df_filtre[~df_filtre["extension_name"].str.contains("Sales", case=False, na=False)]
+# Identifier les appels manqués qui n'ont pas été rappelés
+df_manques_non_rappeles = df_filtre.copy()
+df_manques_non_rappeles['rappel'] = df_manques_non_rappeles.apply(
+    lambda row: df[(df['from_number'] == row['to_number']) &
+                   (df['direction'] == 'out') &
+                   (pd.to_datetime(df['action_time']) > pd.to_datetime(row['action_time']))].empty,
+    axis=1
+)
+
+# Séparation des données VENTE et SAV pour les appels non rappelés
+df_vente = df_manques_non_rappeles[(df_manques_non_rappeles["extension_name"].str.contains("Sales", case=False, na=False)) & (df_manques_non_rappeles['rappel'])]
+df_sav = df_manques_non_rappeles[~(df_manques_non_rappeles["extension_name"].str.contains("Sales", case=False, na=False)) & (df_manques_non_rappeles['rappel'])]
 
 # Affichage du nombre d'appels manqués pour les catégories VENTE et SAV
 nombre_appels_manques_vente = len(df_vente)
